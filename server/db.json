@@ -1,5 +1,11 @@
 {
   "users": [
-    
+    {
+      "fullname": "John Doe",
+      "email": "john@gmail.com",
+      "password": "$2b$10$uPWDQim8UScxx5v4L01a9uH6JJ94pcf6Vy32GI.gwU3PhEHO7soti",
+      "customerID": "cus_OkIy5iTD7pGe9u",
+      "id": 1
+    }
   ]
 }

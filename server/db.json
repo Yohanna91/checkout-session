@@ -1,11 +1,16 @@
 {
   "users": [
     {
-      "fullname": "John Doe",
-      "email": "john@gmail.com",
-      "password": "$2b$10$uPWDQim8UScxx5v4L01a9uH6JJ94pcf6Vy32GI.gwU3PhEHO7soti",
-      "customerID": "cus_OkIy5iTD7pGe9u",
-      "id": 1
+      "fullname": "yohanna",
+      "email": "yohannasium28@gmail.com",
+      "password": "$2b$10$RrA1/IRf3kuJP3HHcucM2.W0x2xeXrbVlp6PImpRDi9.slta0G2eO",
+      "customerID": "cus_Oo2zE1WQNDJnNN"
+    },
+    {
+      "fullname": "emma skoglund",
+      "email": "emma@gmail.com",
+      "password": "$2b$10$f7MA20Ei1OxQHBVLxF35IOaT9zW6LkffTCpq0H1trF8CcKKZt6ASS",
+      "customerID": "cus_Oo33LP9HFeBiK8"
     }
   ]
 }

@@ -3,14 +3,21 @@ const app = express();
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const fs = require("fs");
+const User = require("./models/User");
+const Order = require("./models/Order");
 const stripe = require("stripe")(
   "sk_test_51NoS4DFDZ1Q35EswtM1dk3lqthdqPfKmU11e8luUDoQh3MLYdV6mOdP8AGQz1CaFDcWOXU6IHj4in3QVAOGXMium00i3OYNCnb"
 );
+const bodyParser = require("body-parser");
+const PORT = 3000;
+
+// database
+const database = require("./database/config");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+app.use(bodyParser.json());
 
 app.get("/products", async (req, res) => {
   const products = await stripe.products.list();
@@ -35,62 +42,56 @@ app.post("/checkout/payment", async (req, res) => {
       cancel_url: "http://localhost:5173/checkout", // Replace with your cancel URL
     });
 
-    res.json({ sessionId: session.id });
+    res.json({ sessionId: session.id, orders: req.body });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
-// Endpoints
-app.post("/register", async function (req, res) {
-  //1. Check if inputs are not empty
-  const { fullname, email, password } = req.body;
-  if (!fullname || !email || !password)
-    return res.send("All fields are required");
 
-  // Skapa en customer i Stripe
-  const customer = await stripe.customers.create({
-    email: email,
-  });
-  //3. Create the user with a hashed password.
-  bcrypt.hash(password, saltRounds, function (err, hash) {
-    fs.readFile("db.json", "utf-8", function (err, data) {
-      const usersObject = JSON.parse(data);
-      usersObject["users"].push({
-        fullname,
-        email,
+app.post("/register", function (req, res) {
+  const { email, password } = req.body;
+  bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(password, salt, function (err, hash) {
+      User.create({
+        email: email,
         password: hash,
-        customerID: customer.id,
-      });
-      fs.writeFileSync("db.json", JSON.stringify(usersObject), "utf-8");
-      res.send(usersObject);
+      })
+        .then((ok) => console.log("User is created!"))
+        .catch((error) => console.log(error));
     });
   });
 });
 
-app.post("/login", async function (req, res) {
-  // Find the user in the database
+app.post("/login", function (req, res) {
   const { email, password } = req.body;
-  if (!email || !password) return res.send("All fields are required");
-
-  fs.readFile("db.json", "utf-8", function (err, data) {
-    const usersObject = JSON.parse(data);
-    const user = usersObject["users"].filter((u) => u.email === email)[0];
-
-    if (user) {
-      // Check if the password is correct
-      bcrypt.compare(password, user.password, function (err, result) {
-        // IS the password correct then result = true
-        if (result == true) {
-          res.send({ signedIn: true });
-        } else {
-          res.send({ signedIn: false });
-        }
+  User.findOne({ email: email })
+    .then((match) => {
+      bcrypt.compare(password, match.password, function (err, result) {
+        res.send(result);
       });
-    }
-  });
+    })
+    .catch((err) => console.log(err));
 });
 
-app.listen(4000, () => {
-  console.log("Server startad på port 4000");
+app.post("/order_success/:user", function (req, res) {
+  const body = req.body;
+  const currentUser = req.params.user;
+  Order.create({
+    products: req.body,
+    email: currentUser,
+  })
+    .then((crated) => res.send(true))
+    .catch((err) => res.send(err));
+});
+
+app.get("/myorder/:user", function (req, res) {
+  const user = req.params.user;
+  Order.find({ email: user })
+    .then((products) => res.send(products))
+    .catch((err) => res.send(err));
+});
+
+app.listen(PORT, () => {
+  console.log("Server startad på port " + PORT);
 });

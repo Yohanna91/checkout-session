@@ -1,57 +1,57 @@
-import { Link, useHistory } from "react-router-dom"
-import { useState } from "react"
-const Login = () => {
-  const [email, setEmail] = useState<String>("")
-  const [password, setPassword] = useState<String>("")
+import React, { useState, useEffect } from "react";
+import Input from "../components/Input";
+import Button from "../components/Button";
+import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-  const history = useHistory();
-  
-  async function handleLogin(): Promise<any> {
-    const loginUser = await fetch("http://localhost:4000/login", {
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useHistory();
+
+  useEffect(() => {
+    if (Boolean(localStorage.getItem("signedin"))) {
+      navigate.push("/");
+    }
+  }, []);
+
+  function login() {
+    fetch("http://localhost:3000/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-type": "application/json",
       },
       body: JSON.stringify({ email, password }),
     })
-    const response = await loginUser.json()
-    const { signedIn } = await response
-    
-    // If the user signed in successfully save it to localStorage
-    if (signedIn) {
-      localStorage.setItem("signedIn", signedIn)
-      location.href = "/"
-    }
+      .then((response) => response.json())
+      .then((result) => {
+        if (result) {
+          localStorage.setItem("signedin", true);
+          localStorage.setItem("currentUser", email);
+          navigate.push("/");
+        }
+      });
   }
   return (
-    <div className="bg-white p-4 mt-24 mx-2 w-auto md:w-[800px] md:mx-auto">
-    <div className="flex flex-col space-y-2">
-      <label>Email</label>
-      <input
-        className="bg-gray-200 p-2 outline-none"
-        type="text"
-        name="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+    <div className="bg-white w-[400px] mx-auto mt-12 space-y-4 p-4">
+      <Input
+        onChangeHandler={(e) => setEmail(e.target.value)}
+        type="email"
+        label="Email"
+        placeholder="john@example.com"
       />
-    </div>
-    <div className="flex flex-col space-y-2">
-      <label>Password</label>
-      <input
-        className="bg-gray-200 p-2 outline-none"
+      <Input
+        onChangeHandler={(e) => setPassword(e.target.value)}
         type="password"
-        name="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        label="Password"
+        placeholder="****"
       />
+      <Button text="Login" onClickHandler={login} />
+      <Link to="/register" className="block underline text-yellow-900">
+        Go to register
+      </Link>
     </div>
-      <button onClick={handleLogin} className="bg-purple-500 text-white inline-block mt-4 p-2 w-full">Log in</button>
-      <div className="text-center pt-2 underline">
-      <Link to="/register">Create a new account</Link>
-      </div>
-    </div>
-  )
-}
+  );
+};
 
-
-export default Login
+export default Login;

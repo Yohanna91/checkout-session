@@ -1,4 +1,4 @@
-# Checkout Session with Stripe
+# Mobil e-shop med Stripe (Examensarbete)
 
 Detta projekt är en Butik applikation som är byggt med Node.js/Express backend och React.js frontend tillsammans med Stripe biblioteket för betalningar.
 
@@ -9,6 +9,7 @@ Teknologier/Packages som används är:
 - React.js/Typescript
 - Stripe
 - Express
+- MongoDB för databas och Mongoose (ORM)
 - Cors
 - Tailwind CSS
 - Async Await
@@ -17,7 +18,7 @@ För att starta Servern:
 
 1. Navigera till `./server` i terminalen
 2. Hämta alla packages med `npm install`
-3. Kör servern nu med `npm run start`
+3. Kör servern nu med `npm run dev`
 
 Efter det startar du React:
 
@@ -28,9 +29,23 @@ Efter det startar du React:
 Nu kan du öppna butik applikationen på
 **localhost:5173**
 
-### Övrigt
+Servern körs på
+**localhost:3000**
 
-- Observera att flera saker som JSX element är inte typade då Vite tillkom med `@types/react` och `@types/react-dom`  så det räcker bara med att 
-importera in React som vanligt i varje component så typar den JSX.
+## Obligatoriska moment som jag valt (3st)
 
-- Om du vill testa med din egna Stripe account. Ändra `publishable_key` i projektet till din egna.
+- En egendesignat databas med minst två tabeller. Ska vara normaliserad till lämplig nivå och lämpliga constraints i form av foreign keys etc. används.
+
+_MongoDB databas består utav 2 tabeller (Users & Orders)_
+
+- Koppling till en betallösning
+
+_Projektet använder Stripe för betallösningar_
+
+- Routing och snygga url:er. Alla anrop går via en dispatcher (index.php) och controllers hanterar url-strukturen. Eller liknande, inga anrop till specifika .php-filer.
+
+_React router dom hantering av URL:er och i server används express med params för att hantera unika URL:er_
+
+- Inloggning via OAuth, Google eller liknande tillämpas.
+
+_Implementerat inloggning från grund i Express där lösenordhantering görs med bcrypt och användare sparas och hämtas från MongoDB atlas moln databas_
